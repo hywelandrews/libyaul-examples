@@ -16,14 +16,6 @@ Build the example using make:
 make
 ```
 
-To run a scripted automated test sequence (key on, octave up, octave down, volume 8, key off, running for about 20 seconds at 60 Hz):
-
-```sh
-make clean && make AUTOTEST=1
-```
-
-Run `make clean` whenever you switch between `make` and `make AUTOTEST=1`: object files do not depend on the compiler flags, so the old objects would be reused.
-
 ## How It Works
 
 - The sound CPU (68EC000) is halted using the SMPC sound off command, from `user_init()`, before the pad polling handler is installed. The command register is not locked, so it must not interleave with the pad INTBACK.

@@ -15,9 +15,6 @@ static void _vblank_out_handler(void *work __unused);
 
 static void _input(void);
 static void _draw(void);
-#ifdef SCSP_TONE_AUTOTEST
-static void _autotest(void);
-#endif
 
 static smpc_peripheral_digital_t _digital;
 
@@ -44,9 +41,6 @@ main(void)
                                 _ready = true;
                         }
                 } else {
-#ifdef SCSP_TONE_AUTOTEST
-                        _autotest();
-#endif
                         _input();
                 }
 
@@ -160,32 +154,4 @@ _draw(void)
         dbgio_printf("\n\n");
 
         dbgio_printf("A TOGGLE  UP DN OCTAVE  LT RT VOLUME\n");
-#ifdef SCSP_TONE_AUTOTEST
-        dbgio_printf("AUTOTEST\n");
-#endif
 }
-
-#ifdef SCSP_TONE_AUTOTEST
-static void
-_autotest(void)
-{
-        switch (_frame) {
-        case 240:
-                tone_key_on();
-                break;
-        case 480:
-                tone_octave_set(1);
-                break;
-        case 720:
-                tone_octave_set(-1);
-                break;
-        case 960:
-                tone_octave_set(0);
-                tone_volume_set(8);
-                break;
-        case 1200:
-                tone_key_off();
-                break;
-        }
-}
-#endif

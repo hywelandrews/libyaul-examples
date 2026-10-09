@@ -16,10 +16,6 @@ SH_SRCS:= \
 
 SH_CFLAGS+= -O2 -I. -DDEBUG -g
 
-ifeq ($(strip $(AUTOTEST)),1)
-SH_CFLAGS+= -DSCSP_TONE_AUTOTEST
-endif
-
 SH_LDFLAGS+=
 
 IP_VERSION:= V1.000
