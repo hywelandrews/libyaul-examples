@@ -49,8 +49,8 @@ tone_sound_cpu_halt(void)
         /* libyaul marks this call "do not use"; it is used here on purpose.
          * If the sound CPU is left running, its program rewrites slot registers
          * (slot 0 pitch changed within a second) and sound RAM; with SOUND OFF
-         * issued first the registers keep the programmed values. Observed in
-         * an emulator only, not on hardware.
+         * issued first the registers keep the programmed values. Not yet tested
+         * on hardware.
          *
          * The SMPC command register is not locked: if the pad INTBACK issued
          * from the VBlank-OUT handler interleaves with this command, the
@@ -135,7 +135,6 @@ tone_init(void)
         regs.efsdl   = 0;
         regs.efpan   = 0;
 
-#if defined(DEBUG)
         assert(regs.raw[0] == 0x0021);
         assert(regs.raw[1] == 0x0000);
         assert(regs.raw[2] == 0x0000);
@@ -148,7 +147,6 @@ tone_init(void)
         assert(regs.raw[9] == 0x0000);
         assert(regs.raw[10] == 0x0000);
         assert(regs.raw[11] == 0xE000);
-#endif /* defined(DEBUG) */
 
         for (uint8_t word = 1; word < SCSP_SLOT_WORD_COUNT; word++) {
                 scsp_slot_word_set(TONE_SLOT, word, regs.raw[word]);
@@ -156,7 +154,6 @@ tone_init(void)
 
         scsp_slot_word_set(TONE_SLOT, 0, regs.raw[0]);
 
-#if defined(DEBUG)
         _octave = -2;
         assert(tone_frequency_decihz_get() == 1100);
         _octave = -1;
@@ -167,7 +164,6 @@ tone_init(void)
         assert(tone_frequency_decihz_get() == 8802);
         _octave = 2;
         assert(tone_frequency_decihz_get() == 17603);
-#endif /* defined(DEBUG) */
 
         _octave = 0;
         _on = false;
@@ -217,7 +213,6 @@ tone_octave_set(int8_t octave)
         regs.oct = (uint16_t)(clamped & 0x0F);
         regs.fns = 284;
 
-#if defined(DEBUG)
         switch (_octave) {
         case -2:
                 assert(regs.raw[SCSP_SLOT_WORD_OCT] == 0x711C);
@@ -238,7 +233,6 @@ tone_octave_set(int8_t octave)
                 assert(false);
                 break;
         }
-#endif /* defined(DEBUG) */
 
         scsp_slot_word_set(TONE_SLOT, SCSP_SLOT_WORD_OCT,
             regs.raw[SCSP_SLOT_WORD_OCT]);
