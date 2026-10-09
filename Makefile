@@ -19,6 +19,7 @@ EXAMPLES:= \
 	mm-stats \
 	netlink-template \
 	overlay \
+	scsp-tone \
 	scu-dsp \
 	smpc-rtc \
 	usb-cart \
