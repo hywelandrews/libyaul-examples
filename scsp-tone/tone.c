@@ -18,7 +18,6 @@
 #define TONE_SOUND_RAM_BASE  (0x25A00000UL)
 #define TONE_WAVEFORM_OFFSET (0x10000UL)
 
-static bool _halted;
 static bool _on;
 static int8_t _octave;
 static uint8_t _volume;
@@ -44,27 +43,8 @@ static const int16_t _sine_table[128] = {
 };
 
 void
-tone_sound_cpu_halt(void)
-{
-        /* libyaul marks this call "do not use"; it is used here on purpose.
-         * If the sound CPU is left running, its program rewrites slot registers
-         * (slot 0 pitch changed within a second) and sound RAM; with SOUND OFF
-         * issued first the registers keep the programmed values. Not yet tested
-         * on hardware.
-         *
-         * The SMPC command register is not locked: if the pad INTBACK issued
-         * from the VBlank-OUT handler interleaves with this command, the
-         * handler can wait forever. Call this before that handler exists. */
-        smpc_smc_sndoff_call();
-
-        _halted = true;
-}
-
-void
 tone_init(void)
 {
-        assert(_halted);
-
         /* Key off every slot first, so nothing the halted sound CPU left
          * playing is amplified by the master volume below */
         for (uint8_t slot = 0; slot < SCSP_SLOT_COUNT; slot++) {

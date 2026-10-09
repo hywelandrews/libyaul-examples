@@ -18,9 +18,6 @@ static void _draw(void);
 
 static smpc_peripheral_digital_t _digital;
 
-static uint32_t _frame;
-static bool _ready;
-
 int
 main(void)
 {
@@ -32,25 +29,13 @@ main(void)
                 smpc_peripheral_process();
                 smpc_peripheral_digital_port(1, &_digital);
 
-                if (!_ready) {
-                        /* Peripheral polling runs for 120 frames (two seconds
-                         * at 60 Hz) before the sound RAM and the SCSP
-                         * registers are first written */
-                        if (_frame == 120) {
-                                tone_init();
-                                _ready = true;
-                        }
-                } else {
-                        _input();
-                }
+                _input();
 
                 _draw();
 
                 dbgio_flush();
                 vdp2_sync();
                 vdp2_sync_wait();
-
-                _frame++;
         }
 
         return 0;
@@ -61,9 +46,11 @@ user_init(void)
 {
         smpc_peripheral_init();
 
-        /* Before the VBlank-OUT handler below exists, so the SMPC command
+        /* Halts the sound CPU and waits until the SCSP can be programmed.
+         * Before the VBlank-OUT handler below exists, so the SMPC command
          * cannot interleave with the pad INTBACK it issues */
-        tone_sound_cpu_halt();
+        scsp_init();
+        tone_init();
 
         vdp2_tvmd_display_res_set(VDP2_TVMD_INTERLACE_NONE, VDP2_TVMD_HORZ_NORMAL_A,
             VDP2_TVMD_VERT_224);
@@ -115,11 +102,6 @@ _draw(void)
         dbgio_printf("\033[H\033[2J");
 
         dbgio_printf("SCSP TONE\n\n");
-
-        if (!_ready) {
-                dbgio_printf("INITIALIZING\n");
-                return;
-        }
 
         dbgio_printf("KEY      %s\n", tone_is_on() ? "ON" : "OFF");
 

@@ -28,15 +28,9 @@
  * for a moment at the loop boundary) */
 #define TONE_POSITION_STEP_SAMPLES (4096)
 
-/* Halt the sound CPU. Call once, from user_init(), before the VBlank-OUT
- * handler that polls the pad is installed.
- *
- * The SMPC command register is not locked, so the command must not run while
- * that handler can issue a pad INTBACK. */
-extern void tone_sound_cpu_halt(void);
-
-/* Prepare the sound system. Call once, after tone_sound_cpu_halt() and before
- * any other tone function.
+/* Prepare the sound system. Call once, after scsp_init() (which halts the
+ * sound CPU and waits until the SCSP can be programmed), and before any
+ * other tone function.
  *
  * Keys off all 32 slots, sets the master volume to TONE_VOLUME_DEFAULT, loads
  * the waveform into sound RAM and programs slot 0 (left keyed off, octave 0). */
